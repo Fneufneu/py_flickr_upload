@@ -24,15 +24,16 @@ Dependencies
 -----------
 
 [flickr\_api](https://code.google.com/p/python-flickr-api/)
+
 [jhead](http://www.sentex.net/~mwandel/jhead/): Only if you want to modify the exif data
 
 Usage
 -----
 
-`python flickr_upload.py ~/Pictures/Photo\ Library/Masters`
+`python flickr_upload.py ~/Pictures/iPhoto\ Library/Masters`
 
 or 
 
-`python split_into_200.py ~/Pictures/Photo\ Library/Masters ~/Desktop/output`
+`python split_into_200.py ~/Pictures/iPhoto\ Library/Masters ~/Desktop/output`
 
 
