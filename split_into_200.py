@@ -4,6 +4,10 @@ import shutil
 
 input_folder_path = sys.argv[1]
 output_folder_path = sys.argv[2]
+if not os.path.isdir(input_folder_path):
+    raise Exception("Input not a folder")
+if not os.path.isdir(output_folder_path):
+    os.makedirs(output_folder_path)
 
 class OutputFolder(object):
 
