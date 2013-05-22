@@ -26,6 +26,7 @@ class PhotoUploader(object):
 
     def upload_photo(self, file_path):
         dir_path, name = os.path.split(file_path)
+        name = os.path.splitext(name)[0]
 
         if not self.is_valid(file_path):
             print "Ignoring '%s'" % file_path
