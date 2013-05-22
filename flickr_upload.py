@@ -8,10 +8,11 @@ import flickr_api
 
 class PhotoUploader(object):
 
-    def __init__(self, recreate_exif=False, upload_to_set=False, user=None):
+    def __init__(self, recreate_exif=False, upload_to_set=False, user=None, tags=''):
         self.upload_to_set = upload_to_set
         self.recreate_exif = recreate_exif
         self.user = user
+        self.tags = tags
 
         if self.upload_to_set:
             self.photosets = {}
@@ -38,6 +39,7 @@ class PhotoUploader(object):
 
         flickr_photo = flickr_api.upload(photo_file=file_path,
                                          title=name,
+                                         tags=self.tags,
                                          is_public=0)
 
         if self.upload_to_set:
@@ -103,7 +105,8 @@ def main():
 
     uploader = PhotoUploader(recreate_exif=args.recreate_exif,
                              upload_to_set=args.put_in_sets,
-                             user=user)
+                             user=user,
+                             tags=args.tags)
     print "Counting..."
     paths_to_upload = []
 
@@ -148,6 +151,9 @@ def parse_args():
     parser.add_argument("-e", "--recreate-exif", action="store_true",
                         help=("Replaces the exif data of the date taken with "
                               "the creation date of the file"))
+    parser.add_argument("-t", "--tags", nargs='?', default='',
+                        help=("A space-seperated list of tags "
+                              "to apply to the photo"))
 
     return parser.parse_args()
 
