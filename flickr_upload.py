@@ -80,9 +80,9 @@ class PhotoUploader(object):
             return False
 
         if not self.photos:
-            photos = photoset.getPhotos()
+            self.photos = photoset.getPhotos()
 
-        for photo in photos:
+        for photo in self.photos:
             if name == photo.title:
                 return True
         
@@ -154,6 +154,7 @@ def main():
 
         uploader.upload_photo(file_path)
 
+    print ""
 
 def restart_line():
     sys.stdout.write('\r')
