@@ -15,6 +15,7 @@ class PhotoUploader(object):
         self.recreate_exif = recreate_exif
         self.user = user
         self.tags = tags
+        self.photos = False
 
         if self.upload_to_set:
             self.photosets = {}
@@ -40,13 +41,17 @@ class PhotoUploader(object):
             subprocess.check_call(["jhead", "-mkexif", file_path],
                                   stdout=subprocess.PIPE)
 
+        if self.upload_to_set:
+            photoset_title = os.path.basename(dir_path.rstrip("/"))
+            if self.exist_in_photoset(name, photoset_title):
+                return
+
         flickr_photo = flickr_api.upload(photo_file=file_path,
                                          title=name,
                                          tags=self.tags,
                                          is_public=0)
 
         if self.upload_to_set:
-            photoset_title = os.path.basename(dir_path.rstrip("/"))
             self.add_to_photoset(flickr_photo, photoset_title)
 
 
@@ -64,7 +69,24 @@ class PhotoUploader(object):
         else:
             photoset.addPhoto(photo=photo)
 
+    def exist_in_photoset(self, name, photoset_title):
+        assert self.upload_to_set
 
+        # flickr_api seems to use unicode
+        photoset_title = unicode(photoset_title)
+
+        photoset = self.photosets.get(photoset_title, None)
+        if not photoset:
+            return False
+
+        if not self.photos:
+            photos = photoset.getPhotos()
+
+        for photo in photos:
+            if name == photo.title:
+                return True
+        
+        return False
 
 
 def main():
@@ -114,6 +136,8 @@ def main():
     paths_to_upload = []
 
     for root, dirnames, fns in os.walk(args.input_folder):
+        if '.picasaoriginals' in dirnames:
+            dirnames.remove('.picasaoriginals')
         for fn in fns:
             if not uploader.is_valid(fn):
                 continue
@@ -122,7 +146,7 @@ def main():
             paths_to_upload.append(file_path)
 
 
-    for i, file_path in enumerate(paths_to_upload):
+    for i, file_path in enumerate(sorted(paths_to_upload)):
         name = os.path.basename(file_path)
 
         restart_line()
