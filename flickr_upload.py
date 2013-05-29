@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import signal
 import sys
 import os
 import argparse
@@ -145,8 +146,9 @@ def main():
             file_path = os.path.join(root, fn)
             paths_to_upload.append(file_path)
 
-
     for i, file_path in enumerate(sorted(paths_to_upload)):
+        if stop:
+            break
         name = os.path.basename(file_path)
 
         restart_line()
@@ -185,5 +187,12 @@ def parse_args():
 
     return parser.parse_args()
 
+def signal_handler(signal, frame):
+    global stop
+    stop = True
+
 if __name__ == "__main__":
+    global stop
+    stop = False
+    signal.signal(signal.SIGINT, signal_handler)
     main()
