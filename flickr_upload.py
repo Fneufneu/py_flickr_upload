@@ -148,7 +148,7 @@ def main():
 
     for i, file_path in enumerate(sorted(paths_to_upload)):
         if stop:
-            break
+            sys.exit(130)
         name = os.path.basename(file_path)
 
         restart_line()
