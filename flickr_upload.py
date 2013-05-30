@@ -60,7 +60,7 @@ class PhotoUploader(object):
         assert self.upload_to_set
 
         # flickr_api seems to use unicode
-        photoset_title = unicode(photoset_title)
+        photoset_title = unicode(photoset_title, errors='ignore')
 
         photoset = self.photosets.get(photoset_title, None)
         if not photoset:
@@ -74,7 +74,7 @@ class PhotoUploader(object):
         assert self.upload_to_set
 
         # flickr_api seems to use unicode
-        photoset_title = unicode(photoset_title)
+        photoset_title = unicode(photoset_title, errors='ignore')
 
         photoset = self.photosets.get(photoset_title, None)
         if not photoset:
