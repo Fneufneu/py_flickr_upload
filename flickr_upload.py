@@ -16,7 +16,7 @@ class PhotoUploader(object):
         self.recreate_exif = recreate_exif
         self.user = user
         self.tags = tags
-        self.photos = False
+        self.photos = {}
 
         if self.upload_to_set:
             self.photosets = {}
@@ -44,6 +44,12 @@ class PhotoUploader(object):
 
         if self.upload_to_set:
             photoset_title = os.path.basename(dir_path.rstrip("/"))
+            # flickr_api seems to use unicode
+            try:
+                photoset_title = unicode(photoset_title)
+            except UnicodeDecodeError:
+                photoset_title = photoset_title.decode('iso8859-1')
+
             if self.exist_in_photoset(name, photoset_title):
                 return
 
@@ -59,37 +65,24 @@ class PhotoUploader(object):
     def add_to_photoset(self, photo, photoset_title):
         assert self.upload_to_set
 
-        # flickr_api seems to use unicode
-        try:
-           photoset_title = unicode(photoset_title)
-        except UnicodeDecodeError:
-           photoset_title = photoset_title.decode('iso8859-1')
-
-        photoset = self.photosets.get(photoset_title, None)
-        if not photoset:
+        if photoset_title not in self.photosets:
             photoset = flickr_api.Photoset.create(title=photoset_title,
                                                   primary_photo=photo)
             self.photosets[photoset_title] = photoset
         else:
-            photoset.addPhoto(photo=photo)
+            self.photosets[photoset_title].addPhoto(photo=photo)
 
     def exist_in_photoset(self, name, photoset_title):
         assert self.upload_to_set
 
-        # flickr_api seems to use unicode
-        try:
-           photoset_title = unicode(photoset_title)
-        except UnicodeDecodeError:
-           photoset_title = photoset_title.decode('iso8859-1')
+        if photoset_title not in self.photos:
+            photoset = self.photosets.get(photoset_title, None)
+            if not photoset:
+                return False
 
-        photoset = self.photosets.get(photoset_title, None)
-        if not photoset:
-            return False
+            self.photos[photoset_title] = photoset.getPhotos()
 
-        if not self.photos:
-            self.photos = photoset.getPhotos()
-
-        for photo in self.photos:
+        for photo in self.photos[photoset_title]:
             if name == photo.title:
                 return True
         
